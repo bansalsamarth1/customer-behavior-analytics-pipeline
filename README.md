@@ -1,6 +1,6 @@
 # Customer Behavior Analytics Pipeline
 
-![Project Banner](assets/dashboard_preview.png)
+![Project Banner](assets/Screenshot 2026-07-06 191807.png)
 
 ## 📌 Project Overview
 
