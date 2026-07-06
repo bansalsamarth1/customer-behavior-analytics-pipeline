@@ -1,38 +1,58 @@
 # Customer Behavior Analytics Pipeline
 
-![Project Banner](assets/Screenshot 2026-07-06 191807.png)
+<p align="center">
+  <img src="assets/Screenshot%202026-07-06%20191807.png" alt="Customer Behavior Power BI Dashboard" width="100%" />
+</p>
 
-## 📌 Project Overview
+<p align="center">
+  <b>End-to-end customer shopping behavior analytics project using Python, PostgreSQL, SQL, and Power BI.</b>
+</p>
 
-This project is an **end-to-end customer shopping behavior analytics pipeline** built using **Python, PostgreSQL, SQL, and Power BI**.  
-The goal of the project is to transform raw customer transaction data into a clean analytical dataset, store it inside a PostgreSQL database, perform SQL-based business analysis, and build an interactive Power BI dashboard for decision-making.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-Pandas-blue?style=for-the-badge&logo=python" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql" />
+  <img src="https://img.shields.io/badge/SQL-DBeaver-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=for-the-badge&logo=powerbi&logoColor=black" />
+</p>
 
-The project demonstrates a complete real-world analytics workflow:
+---
+
+## Project Overview
+
+This project analyzes customer shopping behavior to identify trends across revenue, product categories, customer demographics, subscription status, review ratings, purchase frequency, and sales performance.
+
+The project follows a complete analytics engineering workflow:
 
 ```text
 Raw CSV Dataset → Python + Pandas → PostgreSQL → DBeaver SQL Analysis → Power BI Dashboard → Business Insights
 ```
 
+The goal was not only to analyze a CSV file, but to build a practical portfolio-grade data pipeline where cleaned data is stored in a database, analyzed using SQL, and visualized through an interactive BI dashboard.
+
 ---
 
-## 🎯 Business Objective
+## Business Objective
 
-The business objective was to analyze customer shopping behavior and answer key business questions such as:
+The business objective was to convert raw customer shopping data into decision-ready insights.
+
+Key business questions answered:
 
 - Which product categories generate the highest revenue?
-- Which customer age groups contribute the most sales?
+- Which age groups contribute the most sales?
 - How do subscribers and non-subscribers behave differently?
-- Which products are the strongest revenue contributors?
+- Which products are the top revenue contributors?
 - What is the average customer purchase value?
-- How can the business use customer segmentation to improve marketing and inventory planning?
+- Which customer segments should be prioritized for marketing and retention?
 
 ---
 
-## 🧱 Solution Architecture
+## Solution Architecture
 
-![Pipeline Architecture](assets/pipeline_architecture.png)
+<p align="center">
+  <img src="assets/Element%20Data%20Processing-2026-07-06-135032.png" alt="Customer Behavior Analytics Pipeline Architecture" width="100%" />
+</p>
 
-The pipeline follows a structured analytics engineering approach:
+The pipeline was designed as a structured analytics workflow:
 
 1. **Raw CSV Dataset**  
    Customer shopping behavior data was used as the source file.
@@ -41,48 +61,47 @@ The pipeline follows a structured analytics engineering approach:
    Data was loaded, cleaned, transformed, and feature-engineered using Pandas.
 
 3. **PostgreSQL Database Layer**  
-   The cleaned DataFrame was pushed into PostgreSQL using SQLAlchemy.
+   The cleaned Pandas DataFrame was pushed into PostgreSQL using SQLAlchemy.
 
 4. **DBeaver SQL Analysis**  
-   SQL queries were written for revenue analysis, product analysis, subscription analysis, and customer segmentation.
+   SQL queries were written for revenue analysis, product analysis, subscription behavior, and customer segmentation.
 
 5. **Power BI Dashboard**  
    Power BI was connected to PostgreSQL to create an interactive dashboard with KPI cards, charts, and slicers.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Data Source | CSV | Raw customer shopping data |
+| Data Source | CSV | Raw customer shopping behavior dataset |
 | Data Processing | Python, Pandas | Data cleaning and feature engineering |
 | Database Connectivity | SQLAlchemy, psycopg2 | Python-to-PostgreSQL connection |
 | Database | PostgreSQL | Structured analytics storage |
-| SQL IDE | DBeaver | SQL exploration and analysis |
+| SQL IDE | DBeaver | SQL exploration and business analysis |
 | Visualization | Power BI Desktop | Interactive dashboard and reporting |
-| Documentation | PDF, PPT | Portfolio presentation and technical report |
+| Documentation | PDF, PPT | Portfolio report and presentation |
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 customer-behavior-analytics-pipeline/
 │
+├── assets/
+│   ├── Screenshot 2026-07-06 191807.png
+│   └── Element Data Processing-2026-07-06-135032.png
+│
 ├── data/
 │   └── customer_shopping_behavior.csv
 │
-├── notebooks/
+├── notebook/
 │   └── data_cleaning_pipeline.ipynb
 │
 ├── sql/
 │   └── analysis_queries.sql
-│
-├── assets/
-│   ├── dashboard_preview.png
-│   ├── pipeline_architecture.png
-│   └── sql_analysis_preview.png
 │
 ├── reports/
 │   └── Customer_Shopping_Behavior_Portfolio_Report_Final.pdf
@@ -97,20 +116,21 @@ customer-behavior-analytics-pipeline/
 
 ---
 
-## 🧹 Data Cleaning & Feature Engineering
+## Data Engineering Pipeline
 
-The raw dataset was cleaned and transformed using Python and Pandas.
+### 1. Data Loading
 
-### Key Data Preparation Steps
+The raw CSV file was loaded into a Pandas DataFrame for cleaning and transformation.
 
-- Loaded raw CSV into a Pandas DataFrame.
-- Standardized column names into lowercase `snake_case` format.
-- Filled missing `review_rating` values using **category-wise median imputation**.
-- Created an `age_group` column for demographic segmentation.
-- Converted text-based purchase frequency values into numeric day values.
-- Removed redundant columns after validation.
+```python
+import pandas as pd
 
-### Example Column Standardization
+df = pd.read_csv("data/customer_shopping_behavior.csv")
+```
+
+### 2. Column Name Standardization
+
+Raw column names were standardized into lowercase `snake_case` format to make the dataset easier to use in Python, SQL, and Power BI.
 
 | Original Column | Cleaned Column |
 |---|---|
@@ -120,42 +140,82 @@ The raw dataset was cleaned and transformed using Python and Pandas.
 | Subscription Status | subscription_status |
 | Frequency of Purchases | frequency_of_purchases |
 
-### Feature Engineering Examples
+Example logic:
 
-| New Feature | Description |
+```python
+df.columns = (
+    df.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(r"[^a-z0-9]+", "_", regex=True)
+    .str.strip("_")
+)
+```
+
+### 3. Missing Value Handling
+
+Missing values in `review_rating` were handled using category-wise median imputation.
+
+```python
+df["review_rating"] = df.groupby("category")["review_rating"].transform(
+    lambda x: x.fillna(x.median())
+)
+```
+
+This method is stronger than filling all missing values with one global median because it preserves product-category behavior.
+
+### 4. Feature Engineering
+
+New analytical columns were created to improve SQL and Power BI analysis.
+
+| Feature | Description |
 |---|---|
-| `age_group` | Groups customers into Young Adult, Adult, Middle-aged, and Senior segments |
+| `age_group` | Groups customers into Young Adult, Adult, Middle-aged, and Senior |
 | `purchase_frequency_days` | Converts Weekly, Monthly, Quarterly, etc. into numeric day values |
-| `review_rating` | Missing ratings filled using category-wise median values |
+| `review_rating` | Missing values filled using category-wise median |
+
+Purchase frequency mapping:
+
+```python
+frequency_mapping = {
+    "Weekly": 7,
+    "Fortnightly": 14,
+    "Bi-Weekly": 14,
+    "Monthly": 30,
+    "Quarterly": 90,
+    "Every 3 Months": 90,
+    "Annually": 365
+}
+
+df["purchase_frequency_days"] = df["frequency_of_purchases"].map(frequency_mapping)
+```
 
 ---
 
-## 🗄️ PostgreSQL Database Layer
+## PostgreSQL Database Layer
 
-After cleaning the data, the transformed Pandas DataFrame was loaded into a local PostgreSQL database using SQLAlchemy.
+After cleaning and feature engineering, the transformed Pandas DataFrame was loaded into a local PostgreSQL database.
 
-The database layer helped convert a flat CSV file into a structured analytics table that could be used by both SQL tools and Power BI.
-
-### Database Workflow
+The database layer converted the project from simple file-based analysis into a structured analytics workflow.
 
 ```text
 Cleaned Pandas DataFrame → SQLAlchemy Engine → PostgreSQL Table → SQL + Power BI
 ```
 
-### Why PostgreSQL?
+Key implementation points:
 
-- Stores cleaned data in a structured format.
-- Supports advanced SQL analysis.
-- Integrates with Power BI.
-- Makes the project closer to a real production analytics workflow.
+- Used SQLAlchemy for database connectivity.
+- Used PostgreSQL as the central analytics database.
+- Loaded the cleaned DataFrame directly into a PostgreSQL table.
+- Connected both DBeaver and Power BI to the same PostgreSQL database.
 
 ---
 
-## 🔍 SQL Analysis
+## SQL Analysis
 
 SQL analysis was performed in DBeaver on top of the PostgreSQL database.
 
-![SQL Analysis](assets/sql_analysis_preview.png)
+The SQL layer was used to validate dashboard metrics and generate deeper business insights.
 
 ### SQL Techniques Used
 
@@ -164,10 +224,10 @@ SQL analysis was performed in DBeaver on top of the PostgreSQL database.
 - Common Table Expressions
 - Window functions
 - Ranking queries
-- Subscriber vs non-subscriber analysis
+- Subscriber vs non-subscriber comparison
 - Product and category performance analysis
 
-### Example Business Questions Answered
+### Business Questions Answered Using SQL
 
 - Total revenue by gender
 - Customers using discounts who spent more than average
@@ -176,28 +236,39 @@ SQL analysis was performed in DBeaver on top of the PostgreSQL database.
 - Subscriber vs non-subscriber revenue comparison
 - Top products by discount usage
 
+SQL file included in the repository:
+
+```text
+sql/analysis_queries.sql
+```
+
 ---
 
-## 📊 Power BI Dashboard
+## Power BI Dashboard
 
-The final dashboard was created in Power BI Desktop by connecting directly to the PostgreSQL database.
+The final dashboard was built in Power BI Desktop by connecting directly to the PostgreSQL database.
 
-![Power BI Dashboard](assets/dashboard_preview.png)
+<p align="center">
+  <img src="assets/Screenshot%202026-07-06%20191807.png" alt="Customer Behavior Dashboard" width="100%" />
+</p>
 
 ### Dashboard Components
 
-- KPI Cards
+- **KPI Cards**
   - Total Customers
   - Average Purchase Amount
   - Average Review Rating
-- Donut Chart
+
+- **Donut Chart**
   - Subscription Status split
-- Bar and Column Charts
+
+- **Bar and Column Charts**
   - Revenue by Category
   - Sales by Category
   - Revenue by Age Group
   - Sales by Age Group
-- Interactive Slicers
+
+- **Interactive Slicers**
   - Subscription Status
   - Gender
   - Category
@@ -205,7 +276,7 @@ The final dashboard was created in Power BI Desktop by connecting directly to th
 
 ---
 
-## 📈 Key Business Insights
+## Key Business Insights
 
 ### Executive KPIs
 
@@ -271,7 +342,7 @@ The final dashboard was created in Power BI Desktop by connecting directly to th
 
 ---
 
-## 🚀 How to Run This Project Locally
+## How to Run This Project Locally
 
 ### 1. Clone the Repository
 
@@ -310,14 +381,14 @@ Create a local PostgreSQL database, for example:
 customer_behavior_db
 ```
 
-Update your connection details in the notebook or use environment variables for better security.
+Update the PostgreSQL connection details in the notebook or use environment variables for better security.
 
 ### 5. Run the Notebook
 
 Open and run:
 
 ```text
-notebooks/data_cleaning_pipeline.ipynb
+notebook/data_cleaning_pipeline.ipynb
 ```
 
 This will:
@@ -337,26 +408,27 @@ sql/analysis_queries.sql
 
 Run the queries against the PostgreSQL table.
 
-### 7. Open Power BI Dashboard
+### 7. View the Dashboard
 
-Connect Power BI Desktop to the PostgreSQL database and import the cleaned table.
+Open the Power BI dashboard/report file if available locally, or use the dashboard screenshot and project report included in this repository.
 
 ---
 
-## 📦 Deliverables
+## Deliverables
 
-| Deliverable | Description |
+| Deliverable | Location |
 |---|---|
-| Python Notebook | Data cleaning and PostgreSQL loading pipeline |
-| SQL File | Business analysis queries |
-| CSV Dataset | Raw customer shopping behavior data |
-| Power BI Dashboard Screenshot | Final visual dashboard preview |
-| PDF Report | Technical and business project report |
-| PowerPoint Presentation | Portfolio-ready project presentation |
+| Raw Dataset | `data/customer_shopping_behavior.csv` |
+| Data Cleaning Notebook | `notebook/data_cleaning_pipeline.ipynb` |
+| SQL Queries | `sql/analysis_queries.sql` |
+| Dashboard Preview | `assets/Screenshot 2026-07-06 191807.png` |
+| Pipeline Architecture | `assets/Element Data Processing-2026-07-06-135032.png` |
+| PDF Report | `reports/Customer_Shopping_Behavior_Portfolio_Report_Final.pdf` |
+| Presentation | `presentation/Customer-Shopping-Behavior-Analytics-Pipeline.pptx` |
 
 ---
 
-## 💼 Skills Demonstrated
+## Skills Demonstrated
 
 ### Data Engineering
 
@@ -392,7 +464,7 @@ Connect Power BI Desktop to the PostgreSQL database and import the cleaned table
 
 ---
 
-## 🧠 Project Learning Outcome
+## Project Learning Outcome
 
 This project demonstrates the ability to build a full analytics workflow from raw data to business-ready insights.
 
@@ -407,14 +479,14 @@ It reflects practical skills required for roles such as:
 
 ---
 
-## 👤 Author
+## Author
 
 **Samarth Bansal**  
 GitHub: [bansalsamarth1](https://github.com/bansalsamarth1)
 
 ---
 
-## ⭐ Final Note
+## Final Note
 
 This project is designed as a portfolio case study to show practical capability in data cleaning, database design, SQL analysis, and dashboard storytelling.
 
