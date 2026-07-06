@@ -454,6 +454,18 @@ Open the Power BI dashboard/report file if available locally, or use the dashboa
 - Ranking
 - Business analysis queries
 
+## Power BI Dashboard File
+
+The Power BI dashboard file is included in the repository:
+
+[Download Power BI Dashboard](powerbi/customer_behavior_dashboard.pbix)
+
+The dashboard connects to the cleaned analytics table created in PostgreSQL and includes KPI cards, subscription analysis, category revenue, age group revenue, and interactive slicers.
+Note: The Power BI file was developed using a local PostgreSQL connection. To refresh the dashboard, recreate the PostgreSQL table using the provided Python notebook and SQL setup.
+
+
+
+
 ### Business Intelligence
 
 - Power BI dashboard design
